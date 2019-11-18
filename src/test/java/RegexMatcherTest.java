@@ -1,5 +1,6 @@
 import de.alsk.compiler.regex.Regex;
 import de.alsk.compiler.regex.RegexMatcher;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static de.alsk.compiler.regex.Regexes.*;
@@ -56,6 +57,30 @@ public class RegexMatcherTest {
 
         assertTrue(matcher.matches("AAA"));
         assertTrue(matcher.matches(""));
+    }
+
+    @Test
+    public void testAnyRegex() {
+        Regex regex = group(atomar('A'), any());
+        RegexMatcher matcher = new RegexMatcher(regex);
+
+        assertTrue(matcher.matches("A"));
+        assertTrue(matcher.matches("AE"));
+        assertTrue(matcher.matches("A1"));
+        assertFalse(matcher.matches(""));
+        assertFalse(matcher.matches("AAA"));
+    }
+
+    @Test
+    @Ignore("Ignored until the todo in CharAutomatas has been solved")
+    public void testNotRegex() {
+        Regex regex = not(atomar('A'));
+        RegexMatcher matcher = new RegexMatcher(regex);
+
+        assertTrue(matcher.matches(""));
+        assertFalse(matcher.matches("AA"));
+        assertFalse(matcher.matches("B"));
+        assertFalse(matcher.matches("A"));
     }
 
     @Test

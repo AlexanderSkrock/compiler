@@ -83,6 +83,12 @@ public class RegexParser {
                 orRegexes.add(parse(orString));
             }
             return or(orRegexes);
+        } else if(isNotTokenGroup(tokenGroup)) {
+            StringBuilder negatedRegexStringBuilder = new StringBuilder();
+            for(int i = 1; i < tokenGroup.size(); i++) {
+                negatedRegexStringBuilder.append(tokenGroup.get(i).getContent());
+            }
+            return not(parse(negatedRegexStringBuilder.toString()));
         } else if(isInfiniteTokenGroup(tokenGroup)) {
             return infinite(parse(tokenGroup.getFirst().getContent()));
         } else if(isOneOrMoreTokenGroup(tokenGroup)) {
@@ -95,6 +101,8 @@ public class RegexParser {
         } else if(isRangeTokenGroup(tokenGroup)) {
             String content = tokenGroup.getFirst().getContent();
             return parseRange(content.substring(1, content.length() - 1));
+        } else if(isAnyTokenGroup(tokenGroup)) {
+            return any();
         } else if(isAtomarTokenGroup(tokenGroup)) {
             return atomar(tokenGroup.getFirst().getContent().charAt(0));
         } else {
@@ -128,6 +136,14 @@ public class RegexParser {
 
     private boolean isAtomarTokenGroup(LinkedList<RegexScanner.RegexToken> tokenGroup) {
         return tokenGroup.size() == 1 && tokenGroup.getFirst().getType() == Type.ATOMAR;
+    }
+
+    private boolean isAnyTokenGroup(LinkedList<RegexScanner.RegexToken> tokenGroup) {
+        return tokenGroup.size() == 1 && tokenGroup.getFirst().getType() == Type.ANY;
+    }
+
+    private boolean isNotTokenGroup(LinkedList<RegexScanner.RegexToken> tokenGroup) {
+        return tokenGroup.size() >= 1 && tokenGroup.getFirst().getType() == Type.NOT;
     }
 
     private RangeRegex parseRange(String rangeString) throws Exception {

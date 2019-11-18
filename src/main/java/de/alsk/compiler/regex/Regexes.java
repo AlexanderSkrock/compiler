@@ -46,6 +46,14 @@ public class Regexes {
         return new OrRegex(regexes);
     }
 
+    public static AnyRegex any() {
+        return new AnyRegex();
+    }
+
+    public static NotRegex not(Regex regexToNegate) {
+        return new NotRegex(regexToNegate);
+    }
+
     public static Regex parse(String regexString) throws Exception {
         return new RegexParser().parse(regexString);
     }

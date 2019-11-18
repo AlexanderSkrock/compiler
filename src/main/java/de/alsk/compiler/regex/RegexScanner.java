@@ -61,6 +61,8 @@ class RegexScanner {
     private Type getTokenTypeForStartingChar(char startingChar) {
         switch (startingChar) {
             case INFINITE_SYMBOL: return Type.INFINITE;
+            case NOT_SYMBOL: return Type.NOT;
+            case ANY_SYMBOL: return Type.ANY;
             case ONE_OR_MORE_SYMBOL: return Type.ONE_OR_MORE;
             case OPTIONAL_SYMBOL: return Type.OPTIONAL;
             case OR_SYMBOL: return Type.OR;

@@ -10,6 +10,8 @@ public abstract class Regex {
     static final char ONE_OR_MORE_SYMBOL = '+';
     static final char OPTIONAL_SYMBOL = '?';
     static final char OR_SYMBOL = '|';
+    static final char ANY_SYMBOL = '.';
+    static final char NOT_SYMBOL = '^';
 
     public enum Type {
         GROUP,
@@ -18,7 +20,9 @@ public abstract class Regex {
         ONE_OR_MORE,
         OR,
         ATOMAR,
-        RANGE
+        RANGE,
+        ANY,
+        NOT
     }
 
     private Type type;

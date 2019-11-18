@@ -8,16 +8,17 @@ import static de.alsk.compiler.automata.Automatas.*;
 public class RegexTokenAutomata extends AbstractNonDeterministicFiniteAutomata<Regex.Type> {
     static AbstractNonDeterministicFiniteAutomata<Regex.Type> get() {
         return and(RegexTokenAutomata::new,
-                getElementWithOptionalModifier(),
+                getElementWithOptionalPrefixAndModifier(),
                 infinite(RegexTokenAutomata::new,
                     and(RegexTokenAutomata::new,
                             atomar(RegexTokenAutomata::new, Regex.Type.OR),
-                            getElementWithOptionalModifier()))
+                            getElementWithOptionalPrefixAndModifier()))
                 );
     }
 
-    private static AbstractNonDeterministicFiniteAutomata<Regex.Type> getElementWithOptionalModifier() {
+    private static AbstractNonDeterministicFiniteAutomata<Regex.Type> getElementWithOptionalPrefixAndModifier() {
         return and(RegexTokenAutomata::new,
+                optional(RegexTokenAutomata::new, getPrefix()),
                 getElement(),
                 optional(RegexTokenAutomata::new, getModifier()));
     }
@@ -26,7 +27,12 @@ public class RegexTokenAutomata extends AbstractNonDeterministicFiniteAutomata<R
         return or(RegexTokenAutomata::new,
                 atomar(RegexTokenAutomata::new, Regex.Type.RANGE),
                 atomar(RegexTokenAutomata::new, Regex.Type.GROUP),
+                atomar(RegexTokenAutomata::new, Regex.Type.ANY),
                 atomar(RegexTokenAutomata::new, Regex.Type.ATOMAR));
+    }
+
+    private static AbstractNonDeterministicFiniteAutomata<Regex.Type> getPrefix() {
+        return atomar(RegexTokenAutomata::new, Regex.Type.NOT);
     }
 
     private static AbstractNonDeterministicFiniteAutomata<Regex.Type> getModifier() {

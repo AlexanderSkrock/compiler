@@ -85,6 +85,20 @@ public class RegexParserTest {
     }
 
     @Test
+    public void testParseAny() throws Exception {
+        Regex expectedResult = any();
+        Regex parsedResult = regexParser.parse(".");
+        assertEquals(expectedResult, parsedResult);
+    }
+
+    @Test
+    public void testParseNot() throws Exception {
+        Regex expectedResult = not(atomar('A'));
+        Regex parsedResult = regexParser.parse("^A");
+        assertEquals(expectedResult, parsedResult);
+    }
+
+    @Test
     public void testParseComplex() throws Exception {
         Regex expectedResult = group(
                 atomar('A'),
@@ -92,6 +106,7 @@ public class RegexParserTest {
                         or(atomar('B'), optional(atomar('D'))),
                         atomar('E'))),
                 atomar('A'),
+                any(),
                 atomar('C'),
                 oneOrMore(range(new RangeRegex.CharRange('0', '9'))),
                 atomar('K'),
@@ -99,10 +114,10 @@ public class RegexParserTest {
                     atomar('L'),
                     infinite(group(
                                 atomar('A'),
-                                atomar('D'),
+                                not(atomar('D')),
                                 atomar('C')))));
 
-        Regex parsedResult  = regexParser.parse("A(B|D?E)*AC[0-9]+KL|(ADC)*");
+        Regex parsedResult  = regexParser.parse("A(B|D?E)*A.C[0-9]+KL|(A^DC)*");
         assertEquals(expectedResult, parsedResult);
     }
 }

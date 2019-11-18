@@ -27,7 +27,7 @@ public class RegexMatcher {
         this.alphabet = alphabet;
     }
 
-    public boolean matches(String input) throws Exception {
+    public boolean matches(String input) {
         AbstractNonDeterministicFiniteAutomata<Character> automata = CharAutomatas.fromRegex(regex, alphabet);
         for(char c : input.toCharArray()) {
             automata.process(c);

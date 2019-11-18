@@ -8,7 +8,7 @@ import static org.junit.Assert.assertTrue;
 
 public class RegexMatcherTest {
     @Test
-    public void testAtomarRegex() throws Exception {
+    public void testAtomarRegex() {
         Regex regex = atomar('A');
         RegexMatcher matcher = new RegexMatcher(regex);
 
@@ -18,7 +18,7 @@ public class RegexMatcherTest {
     }
 
     @Test
-    public void testOptionalRegex() throws Exception {
+    public void testOptionalRegex() {
         Regex regex = optional(atomar('A'));
         RegexMatcher matcher = new RegexMatcher(regex);
 
@@ -28,7 +28,7 @@ public class RegexMatcherTest {
     }
 
     @Test
-    public void testOrRegex() throws Exception {
+    public void testOrRegex() {
         Regex regex = or(atomar('B'), atomar('A'));
         RegexMatcher matcher = new RegexMatcher(regex);
 
@@ -41,7 +41,7 @@ public class RegexMatcherTest {
     }
 
     @Test
-    public void testOneOrMoreRegex() throws Exception {
+    public void testOneOrMoreRegex() {
         Regex regex = oneOrMore(atomar('A'));
         RegexMatcher matcher = new RegexMatcher(regex);
 
@@ -50,7 +50,7 @@ public class RegexMatcherTest {
     }
 
     @Test
-    public void testInfiniteRegex() throws Exception {
+    public void testInfiniteRegex() {
         Regex regex = infinite(atomar('A'));
         RegexMatcher matcher = new RegexMatcher(regex);
 
@@ -59,7 +59,7 @@ public class RegexMatcherTest {
     }
 
     @Test
-    public void testComplexRegex() throws Exception {
+    public void testComplexRegex() {
         Regex regex = infinite(or(group(atomar('A'), atomar('B')), atomar('C')));
         RegexMatcher matcher = new RegexMatcher(regex);
 

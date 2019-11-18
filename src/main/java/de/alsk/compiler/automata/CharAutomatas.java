@@ -62,8 +62,18 @@ public class CharAutomatas {
                 return or(subAutomatas);
             }
             case NOT: {
+                Regex regexToNegate = ((NotRegex) regex).getNegatedRegex();
+                if(regexToNegate instanceof AtomarRegex) {
+                    List<AbstractNonDeterministicFiniteAutomata<Character>> subAutomatas = new LinkedList<>();
+                    for(char c : alphabet) {
+                        if (c != ((AtomarRegex) regexToNegate).getCharacter()) {
+                            subAutomatas.add(atomar(c));
+                        }
+                    }
+                    return or(subAutomatas);
+                }
                 // TODO Add implementation for negation (NFA to DFA -> Complement)
-                return fromRegex(((NotRegex) regex).getNegatedRegex(), alphabet);
+                return fromRegex(regexToNegate, alphabet);
             }
             default:
                 throw new RuntimeException("unknown regex type: " + regex.getType());

@@ -61,12 +61,12 @@ public class RegexMatcherTest {
 
     @Test
     public void testAnyRegex() {
-        Regex regex = group(atomar('A'), any());
+        Regex regex = group(atomar('A'), any(), infinite(atomar('C')));
         RegexMatcher matcher = new RegexMatcher(regex);
 
-        assertTrue(matcher.matches("A"));
         assertTrue(matcher.matches("AE"));
         assertTrue(matcher.matches("A1"));
+        assertFalse(matcher.matches("A"));
         assertFalse(matcher.matches(""));
         assertFalse(matcher.matches("AAA"));
     }

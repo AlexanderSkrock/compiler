@@ -27,10 +27,10 @@ public class Automatas {
                 .getStartingState());
     }
 
-    public static<T> AbstractNonDeterministicFiniteAutomata<T> and(Function<State<T>, ? extends AbstractNonDeterministicFiniteAutomata<T>> supplier, AbstractNonDeterministicFiniteAutomata<T> a, AbstractNonDeterministicFiniteAutomata<T> b) {
+    private static<T> AbstractNonDeterministicFiniteAutomata<T> and(Function<State<T>, ? extends AbstractNonDeterministicFiniteAutomata<T>> supplier, AbstractNonDeterministicFiniteAutomata<T> a, AbstractNonDeterministicFiniteAutomata<T> b) {
         Set<State<T>> acceptingStatesOfA = queryForAcceptingStates(a.getStartingState());
         State<T> startingStateOfB = b.getStartingState();
-        acceptingStatesOfA.forEach(acceptingState -> acceptingState.addTransition(a.getEmptyInput(), startingStateOfB));
+        acceptingStatesOfA.forEach(acceptingState -> State.toNormal(acceptingState).addTransition(a.getEmptyInput(), startingStateOfB));
         return supplier.apply(a.getStartingState());
     }
 
@@ -39,18 +39,8 @@ public class Automatas {
     }
 
     public static<T> AbstractNonDeterministicFiniteAutomata<T> or(Function<State<T>, ? extends AbstractNonDeterministicFiniteAutomata<T>> supplier, List<AbstractNonDeterministicFiniteAutomata<T>> automatas) {
-        return supplier.apply(automatas.stream()
-                .reduce((a, b) -> Automatas.or(supplier, a, b)).get()
-                .getStartingState());
-    }
-
-    public static<T> AbstractNonDeterministicFiniteAutomata<T> or(Function<State<T>, ? extends AbstractNonDeterministicFiniteAutomata<T>> supplier, AbstractNonDeterministicFiniteAutomata<T> a, AbstractNonDeterministicFiniteAutomata<T> b) {
         State<T> newStartingState = State.normal();
-        newStartingState.addTransition(a.getEmptyInput(), a.getStartingState());
-        newStartingState.addTransition(b.getEmptyInput(), b.getStartingState());
-
-        State<T> newEndState = State.normal();
-        queryForAcceptingStates(newStartingState).forEach(state -> state.addTransition(a.getEmptyInput(), newEndState));
+        automatas.forEach(automata -> newStartingState.addTransition(automata.getEmptyInput(), automata.getStartingState()));
         return supplier.apply(newStartingState);
     }
 
@@ -86,6 +76,8 @@ public class Automatas {
 
         startingState.getTransitions().entries().stream()
                 .map(Map.Entry::getValue)
+                .distinct()
+                .filter(Predicate.not(visitedStates::contains))
                 .forEach(state -> acceptingStates.addAll(queryForAcceptingStates(state, visitedStates)));
         return acceptingStates;
     }

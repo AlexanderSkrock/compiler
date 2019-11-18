@@ -15,20 +15,18 @@ public class RegexMatcher {
         }
     }
 
-    private Regex regex;
-    private Set<Character> alphabet;
+    private AbstractNonDeterministicFiniteAutomata<Character> automata;
 
     public RegexMatcher(Regex regex) {
         this(regex, COMPLETE_ALPHABET);
     }
 
     public RegexMatcher(Regex regex, Set<Character> alphabet) {
-        this.regex = regex;
-        this.alphabet = alphabet;
+        this.automata = CharAutomatas.fromRegex(regex, alphabet);
     }
 
     public boolean matches(String input) {
-        AbstractNonDeterministicFiniteAutomata<Character> automata = CharAutomatas.fromRegex(regex, alphabet);
+        automata.reset();
         for(char c : input.toCharArray()) {
             automata.process(c);
         }

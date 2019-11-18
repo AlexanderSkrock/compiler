@@ -19,7 +19,7 @@ public class CharAutomatas {
         return fromRegex(regex, alphabet);
     }
 
-    public static AbstractNonDeterministicFiniteAutomata<Character> fromRegex(Regex regex, Set<Character> alphabet) throws Exception {
+    public static AbstractNonDeterministicFiniteAutomata<Character> fromRegex(Regex regex, Set<Character> alphabet) {
         switch (regex.getType()) {
             case ATOMAR: {
                 State<Character> startingSate = State.normal();
@@ -54,8 +54,19 @@ public class CharAutomatas {
                 }
                 return or(subAutomatas);
             }
+            case ANY: {
+                List<AbstractNonDeterministicFiniteAutomata<Character>> subAutomatas = new LinkedList<>();
+                for(char c : alphabet) {
+                    subAutomatas.add(atomar(c));
+                }
+                return or(subAutomatas);
+            }
+            case NOT: {
+                // TODO Add implementation for negation (NFA to DFA -> Complement)
+                return fromRegex(((NotRegex) regex).getNegatedRegex(), alphabet);
+            }
             default:
-                throw new Exception("unknown regex type: " + regex.getType());
+                throw new RuntimeException("unknown regex type: " + regex.getType());
         }
     }
 

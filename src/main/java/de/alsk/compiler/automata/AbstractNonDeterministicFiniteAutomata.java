@@ -9,6 +9,10 @@ public abstract class AbstractNonDeterministicFiniteAutomata<T> implements Autom
 
     public AbstractNonDeterministicFiniteAutomata(State<T> startingState) {
         this.startingState = startingState;
+        prepareAutomata();
+    }
+
+    private void prepareAutomata() {
         currentStates = new HashSet<>();
         currentStates.add(startingState);
         currentStates.addAll(calculateAllStatesReachableWithEmptyInput(currentStates));
@@ -43,6 +47,11 @@ public abstract class AbstractNonDeterministicFiniteAutomata<T> implements Autom
                 .map(state -> Objects.requireNonNullElse(state.getTransitionsFor(input), new LinkedList<State<T>>()))
                 .flatMap(Collection::stream)
                 .collect(Collectors.toSet());
+    }
+
+    @Override
+    public void reset() {
+        prepareAutomata();
     }
 
     @Override

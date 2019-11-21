@@ -12,16 +12,16 @@ import java.util.*;
 import java.util.function.Predicate;
 
 public class SimpleScanner<TokenType> implements Scanner<TokenType> {
-    private final OrderedMap<AbstractNonDeterministicFiniteAutomata<Character>, TokenType> automataToTokenTypeMap;
+    private final OrderedMap<TokenType, AbstractNonDeterministicFiniteAutomata<Character>> automataToTokenTypeMap;
 
     private String input;
     private int lastProcessedIndex = -1;
 
-    SimpleScanner(OrderedMap<Regex, TokenType> regexesToTokenType, Set<Character> alphabet) {
+    SimpleScanner(OrderedMap<TokenType, Regex> regexesToTokenType, Set<Character> alphabet) {
         automataToTokenTypeMap = new ListOrderedMap<>();
-        regexesToTokenType.forEach((regex, tokenType) -> {
+        regexesToTokenType.forEach((tokenType, regex) -> {
             AbstractNonDeterministicFiniteAutomata<Character> tokenAutomata = CharAutomatas.fromRegex(regex, alphabet);
-            automataToTokenTypeMap.put(tokenAutomata, tokenType);
+            automataToTokenTypeMap.put(tokenType, tokenAutomata);
         });
     }
 
@@ -43,19 +43,20 @@ public class SimpleScanner<TokenType> implements Scanner<TokenType> {
     }
 
     private Token<TokenType> findNext() {
-        automataToTokenTypeMap.forEach((automata, tokenType) -> automata.reset());
+        automataToTokenTypeMap.forEach((tokenType, automata) -> automata.reset());
 
         int longestMatchLength = -1;
-        LinkedList<AbstractNonDeterministicFiniteAutomata<Character>> automatasWithLongestMatch = new LinkedList<>();
+        LinkedList<TokenType> typeWithLongestMatch = new LinkedList<>();
 
         int currentIndex = lastProcessedIndex +1;
-        for(int offset = 0; currentIndex + offset < input.length() && automataToTokenTypeMap.keySet().stream().anyMatch(Predicate.not(Automata::isInErrorState)); offset++) {
+        for(int offset = 0; currentIndex + offset < input.length() && automataToTokenTypeMap.values().stream().anyMatch(Predicate.not(AbstractNonDeterministicFiniteAutomata::isInErrorState)); offset++) {
             char currentCharacter = input.charAt(currentIndex + offset);
             int currentLength = offset +1;
 
-            OrderedMapIterator<AbstractNonDeterministicFiniteAutomata<Character>, TokenType> iterator = automataToTokenTypeMap.mapIterator();
+            OrderedMapIterator<TokenType, AbstractNonDeterministicFiniteAutomata<Character>> iterator = automataToTokenTypeMap.mapIterator();
             while(iterator.hasNext()) {
-                AbstractNonDeterministicFiniteAutomata<Character> automata = iterator.next();
+                TokenType type = iterator.next();
+                AbstractNonDeterministicFiniteAutomata<Character> automata = automataToTokenTypeMap.get(type);
                 if(automata.isInErrorState()) {
                     continue;
                 }
@@ -63,9 +64,9 @@ public class SimpleScanner<TokenType> implements Scanner<TokenType> {
                 if(automata.isInAcceptingState()) {
                     if(currentLength != longestMatchLength) {
                         longestMatchLength = currentLength;
-                        automatasWithLongestMatch = new LinkedList<>();
+                        typeWithLongestMatch = new LinkedList<>();
                     }
-                    automatasWithLongestMatch.add(automata);
+                    typeWithLongestMatch.add(type);
                 }
             }
         }
@@ -73,6 +74,6 @@ public class SimpleScanner<TokenType> implements Scanner<TokenType> {
         if(longestMatchLength < 0) {
             return null;
         }
-        return new Token<>(automataToTokenTypeMap.get(automatasWithLongestMatch.getFirst()), input.substring(currentIndex, currentIndex + longestMatchLength));
+        return new Token<>(typeWithLongestMatch.getFirst(), input.substring(currentIndex, currentIndex + longestMatchLength));
     }
 }

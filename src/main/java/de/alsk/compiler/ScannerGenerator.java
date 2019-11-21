@@ -8,26 +8,26 @@ import org.apache.commons.collections4.map.ListOrderedMap;
 import java.util.Set;
 
 public class ScannerGenerator<TokenType> {
-    private OrderedMap<String, TokenType> tokenDefinitions;
+    private OrderedMap<TokenType, String> tokenDefinitions;
 
     public ScannerGenerator() {
         tokenDefinitions = new ListOrderedMap<>();
     }
 
-    public void addToken(String regexString, TokenType type) {
-        tokenDefinitions.put(regexString, type);
+    public void addToken(TokenType type, String regexString) {
+        tokenDefinitions.put(type, regexString);
     }
 
-    public void removeToken(String regexString) {
-        tokenDefinitions.remove(regexString);
+    public void removeToken(TokenType type) {
+        tokenDefinitions.remove(type);
     }
 
     public SimpleScanner<TokenType> generate(Set<Character> alphabet) {
-        OrderedMap<Regex, TokenType> tokenAutomataMap = new ListOrderedMap<>();
-        tokenDefinitions.forEach((regexString, tokenType) -> {
+        OrderedMap<TokenType, Regex> tokenAutomataMap = new ListOrderedMap<>();
+        tokenDefinitions.forEach((tokenType, regexString) -> {
             try {
                 Regex regex = Regexes.parse(regexString);
-                tokenAutomataMap.put(regex, tokenType);
+                tokenAutomataMap.put(tokenType, regex);
             } catch (Exception e) {
                 e.printStackTrace();
             }
